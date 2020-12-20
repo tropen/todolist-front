@@ -133,6 +133,7 @@ export default {
         this.loading = false;
       } catch (e) {
         console.warn(e);
+        this.$router.push('404');
       } finally {
         this.loading = false;
       }
