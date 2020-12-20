@@ -25,12 +25,12 @@ const router = new VueRouter({
             component: () => import('@/views/404'),
         },
         {
-            path: '/500',
-            name: '500',
+            path: '/504',
+            name: '504',
             meta: {
-                title: 'Error 500',
+                title: 'Error 504',
             },
-            component: () => import('@/views/500'),
+            component: () => import('@/views/504'),
         },
         {
             path: '/*',

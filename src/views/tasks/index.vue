@@ -133,7 +133,7 @@ export default {
         this.loading = false;
       } catch (e) {
         console.warn(e);
-        this.$router.push('500');
+        this.$router.push('504');
       } finally {
         this.loading = false;
       }
