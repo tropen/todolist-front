@@ -25,6 +25,14 @@ const router = new VueRouter({
             component: () => import('@/views/404'),
         },
         {
+            path: '/500',
+            name: '500',
+            meta: {
+                title: 'Error 500',
+            },
+            component: () => import('@/views/500'),
+        },
+        {
             path: '/*',
             redirect: '404',
             hidden: true,

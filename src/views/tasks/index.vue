@@ -85,7 +85,7 @@ import {
   getTaskStatuses,
   updateTask
 } from '@/services/taskService';
-import TaskModal from "@/views/tasks/TaskModal";
+import TaskModal from "@/views/tasks/components/TaskModal";
 
 
 export default {
