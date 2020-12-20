@@ -13,7 +13,17 @@
           label="Description:"
           label-for="description"
       >
-        <b-form-textarea id="description" class="form" v-model="form.description" required/>
+        <b-form-textarea id="description" v-model="form.description" required/>
+      </b-form-group>
+
+      <b-form-group
+          label="Status:"
+          label-for="status"
+      >
+        <b-form-checkbox id="status" switch size="lg" v-model="form.status"
+                         :value="completed"
+                         :unchecked-value="planned"
+        >{{statusStr}}</b-form-checkbox>
       </b-form-group>
       <b-form-group>
       <b-button type="submit" class="mr-1" variant="primary">Submit</b-button>
@@ -38,8 +48,16 @@ export default {
       form: {
         name: '',
         description: '',
+        status: 1,
       },
       planned: 1,
+      completed: 2,
+      statusArr: {2:'Completed', 1:'Planned'},
+    }
+  },
+  computed:{
+    statusStr:function (){
+      return this.statusArr[this.form.status];
     }
   },
   methods: {
@@ -49,7 +67,7 @@ export default {
         let task = {
           name:this.form.name,
           description:this.form.description,
-          status:this.planned,
+          status:this.form.status,
         };
         await addTask(task);
         this.$router.push('/tasks/');
