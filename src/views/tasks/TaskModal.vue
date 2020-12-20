@@ -6,10 +6,12 @@
            @hide="closeModal()">
     <div class="text-center">
       <strong>{{ task.id }}. {{ task.name }}</strong>
-      <div><strong>Status: </strong>{{ task.status }}</div>
-      <div><strong>Description: </strong>{{ task.description }}</div>
       <br/>
-      <div v-if="actionType==='delete'">Delete this task?</div>
+      <br/>
+      <div class="text-left"><strong>Status: </strong>{{ task.status }}</div>
+      <div class="text-left"><strong>Description: </strong>{{ task.description }}</div>
+
+      <div v-if="actionType==='delete'"><br/> Delete this task?</div>
     </div>
   </b-modal>
 </template>
@@ -52,8 +54,7 @@ export default {
   },
   methods: {
     init() {
-      if(this.actionType === 'delete')
-      {
+      if (this.actionType === 'delete') {
         this.title = 'Delete confirmation';
       }
     },
