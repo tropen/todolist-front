@@ -126,9 +126,9 @@ export default {
         });
         this.tasks = data;
         this.fields = [
-          {key: 'id', sortable: true},
-          {key: 'name', sortable: true},
-          {key: 'status', sortable: true},
+          {key: 'id', label: 'Id'},
+          {key: 'name', label: 'Name'},
+          {key: 'status', label: 'Status'},
           {key: 'actions', label: 'Actions'}];
         this.loading = false;
       } catch (e) {
