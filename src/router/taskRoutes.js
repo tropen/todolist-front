@@ -1,7 +1,6 @@
 export const taskRoutes = [
   {
     path: '/tasks',
-    // meta: { authRequired: true, hidden: true },
     component: () => import('@/layouts/App'),
     children: [
       {
@@ -28,14 +27,6 @@ export const taskRoutes = [
         name: 'TaskCreate',
         component: () => import('@/views/tasks/store'),
       },
-      // {
-      //   path: 'delete/:id',
-      //   meta: {
-      //     title: 'Delete Task',
-      //   },
-      //   name: 'TaskDelete',
-      //   component: () => import('@/views/tasks/delete'),
-      // },
     ],
   },
 ]
