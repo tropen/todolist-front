@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Task list</h1>
+    <b-card class="mt-3">
     <div class="add-btn">
       <b-button size="md"
                 @click="addTask()"
@@ -70,15 +70,19 @@
         <div>{{ infoModal.description }}</div>
       </div>
     </b-modal>
+    <template #header>
+      <h1>Task list</h1>
+    </template>
+    </b-card>
   </div>
 </template>
 
 <script>
-const PLANNED = 1;
-const COMPLETED = 2;
 import {
   deleteTask,
-  getAllTasks, getTaskStatuses, updateTask
+  getAllTasks,
+  getTaskStatuses,
+  updateTask
 } from '@/services/taskService';
 
 
@@ -88,8 +92,8 @@ export default {
   data() {
     return {
       loading: false,
-      planned: PLANNED,
-      completed: COMPLETED,
+      planned: 1,
+      completed: 2,
       tasks: [],
       fields: [],
       statuses: [],
@@ -102,6 +106,7 @@ export default {
       infoModal: {
         id: 'info-modal',
         name: '',
+        status: '',
         itemId: '',
         description: '',
       },
@@ -147,10 +152,10 @@ export default {
       this.$router.push('/tasks/add');
     },
     markCompleted(row) {
-      this.updateStatus(row.index, row.item.id, COMPLETED);
+      this.updateStatus(row.index, row.item.id, this.completed);
     },
     markPlanned(row) {
-      this.updateStatus(row.index, row.item.id, PLANNED);
+      this.updateStatus(row.index, row.item.id, this.planned);
     },
     async updateStatus(taskIndex, taskId, status) {
       try {
@@ -166,6 +171,7 @@ export default {
       this.infoModal.name = item.name;
       this.infoModal.itemId = item.id;
       this.infoModal.description = item.description;
+      this.infoModal.status = item.status;
 
       this.$root.$emit('bv::show::modal', this.infoModal.id, button);
     },
@@ -212,5 +218,8 @@ export default {
 .add-btn-lbl {
   height: 1.3em;
   width: 1.3em;
+}
+.card-body{
+  padding: 0;
 }
 </style>

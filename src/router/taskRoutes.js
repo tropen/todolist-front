@@ -20,9 +20,9 @@ export const taskRoutes = [
       //   component: () => import('@/views/tasks/store'),
       // },
       {
-        path: 'create',
+        path: '/tasks/add',
         meta: {
-          title: 'Create Task',
+          title: 'add Task',
         },
         name: 'TaskCreate',
         component: () => import('@/views/tasks/store'),

@@ -1,0 +1,79 @@
+<template>
+  <div>
+    <b-card class="mt-3">
+    <b-form @submit="onSubmit" @reset="onCancel" class="form-align-left" :state="nameState && descriptionState">
+      <b-form-group
+          label="Task name:"
+          label-for="name"
+          description="This can be a brief description"
+      >
+        <b-form-input id='name' type="text" v-model="form.name" required/>
+      </b-form-group>
+      <b-form-group
+          label="Description:"
+          label-for="description"
+      >
+        <b-form-textarea id="description" class="form" v-model="form.description" required/>
+      </b-form-group>
+      <b-form-group>
+      <b-button type="submit" class="mr-1" variant="primary">Submit</b-button>
+      <b-button type="reset" class="mr-1" >Cancel</b-button>
+      </b-form-group>
+
+    </b-form>
+    <template #header>
+      <h1>New task</h1>
+    </template>
+      </b-card>
+  </div>
+</template>
+
+<script>
+import {addTask} from '@/services/taskService';
+
+export default {
+  name: "index",
+  data() {
+    return {
+      form: {
+        name: '',
+        description: '',
+      },
+      planned: 1,
+    }
+  },
+  computed: {
+    nameState() {
+      return (this.form.name.length > 3)
+    },
+    descriptionState() {
+      return (this.form.description.length > 10)
+    }
+  },
+  methods: {
+    async onSubmit(event) {
+      event.preventDefault()
+      try {
+        let task = {
+          name:this.form.name,
+          description:this.form.description,
+          status:this.planned,
+        };
+        await addTask(task);
+        this.$router.push('/tasks/');
+      } catch (e) {
+        console.warn(e);
+      }
+    },
+    onCancel() {
+      this.$router.push('/tasks/');
+    }
+  }
+}
+</script>
+
+<style scoped>
+.form-align-left{
+  text-align: left;
+}
+</style>
