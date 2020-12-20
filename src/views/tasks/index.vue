@@ -52,13 +52,13 @@
       </b-table>
 
       <task-modal
-      :id="'delete-modal'"
-      :task="model.item"
-      :index="model.index"
-      :actionType="'delete'"
+          :id="'delete-modal'"
+          :task="model.item"
+          :index="model.index"
+          :actionType="'delete'"
 
-      @close-modal="resetModel"
-      @confirm-modal="handleDelete"
+          @close-modal="resetModel"
+          @confirm-modal="handleDelete"
       >
       </task-modal>
 
@@ -147,7 +147,6 @@ export default {
       }
       return item;
     },
-
     addTask() {
       this.$router.push('/tasks/add');
     },
@@ -187,7 +186,6 @@ export default {
       this.model.item = {};
       this.model.index = -1;
     },
-
     async handleDelete(item, taskIndex) {
       try {
         let {status} = await deleteTask(item.id);
