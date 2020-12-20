@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import {addTask} from '@/services/taskService';
+import {addTask, getTaskStatuses} from '@/services/taskService';
 
 export default {
   name: "index",
@@ -50,17 +50,29 @@ export default {
         description: '',
         status: 1,
       },
+      statuses: {},
       planned: 1,
       completed: 2,
-      statusArr: {2:'Completed', 1:'Planned'},
     }
   },
   computed:{
     statusStr:function (){
-      return this.statusArr[this.form.status];
+      return this.statuses[this.form.status];
     }
   },
+  created() {
+    this.init();
+  },
   methods: {
+    async init() {
+      try {
+        let response = await getTaskStatuses();
+        this.statuses = response.data;
+      } catch (e) {
+        console.warn(e);
+        this.$router.push('/504');
+      }
+    },
     async onSubmit(event) {
       event.preventDefault()
       try {

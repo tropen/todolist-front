@@ -89,7 +89,7 @@ import TaskModal from "@/views/tasks/components/TaskModal";
 
 
 export default {
-  name: "index",
+  name: "tasks",
   components: {
     TaskModal,
   },
@@ -122,7 +122,6 @@ export default {
         data.forEach((item) => {
           item = this.setItemColor(item);
           item.status = this.statuses[item.status];
-
         });
         this.tasks = data;
         this.fields = [
@@ -215,5 +214,8 @@ export default {
 
 .card-body {
   padding: 0;
+}
+.b-table {
+  margin-bottom: 0;
 }
 </style>
