@@ -37,7 +37,7 @@
         </b-button>
         <b-button size="md"
                   class="mr-1"
-                  @click="inspectTask(row.item)"
+                  @click="showInfoModal(row.item, row.index, $event.target)"
                   variant="outline-primary"
                   v-b-tooltip.hover title="Inspect">
           <b-icon icon="search" aria-hidden="true"></b-icon>
@@ -55,9 +55,19 @@
              title="Delete confirmation"
              @ok="handleDelete(deleteModal.itemId, deleteModal.index)"
              @hide="resetDeleteModal">
-      <div class="align-content-center">
-        <div>{{ deleteModal.itemId }}. {{ deleteModal.name }}</div>
-        Are you sure?
+      <div class="text-center">
+        <strong>{{ deleteModal.itemId }}. {{ deleteModal.name }}</strong>
+        <div>Delete this task?</div>
+      </div>
+    </b-modal>
+
+    <b-modal :id="infoModal.id"
+             title="Task information"
+             ok-only
+             @hide="resetInfoModal">
+      <div class="text-center">
+        <strong>{{ infoModal.itemId }}. {{ infoModal.name }}</strong>
+        <div>{{ infoModal.description }}</div>
       </div>
     </b-modal>
   </div>
@@ -83,13 +93,18 @@ export default {
       tasks: [],
       fields: [],
       statuses: [],
-
       deleteModal: {
-        id: 'info-modal',
+        id: 'delete-modal',
         name: '',
         itemId: '',
         index: -1,
-      }
+      },
+      infoModal: {
+        id: 'info-modal',
+        name: '',
+        itemId: '',
+        description: '',
+      },
     }
   },
   created() {
@@ -104,7 +119,9 @@ export default {
 
         let {data} = await getAllTasks();
         data.forEach((item) => {
+          item = this.setItemColor(item);
           item.status = this.statuses[item.status];
+
         });
         this.tasks = data;
         this.fields = ['id', 'name', 'status', {key: 'actions', label: 'Actions'}]
@@ -114,6 +131,16 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+
+    setItemColor(item) {
+      if (item.status === this.planned) {
+        item._cellVariants = {status: 'info'};
+      }
+      if (item.status === this.completed) {
+        item._cellVariants = {status: 'success'};
+      }
+      return item;
     },
 
     addTask() {
@@ -128,21 +155,26 @@ export default {
     async updateStatus(taskIndex, taskId, status) {
       try {
         let {data} = await updateTask(taskId, {status: status});
+        this.setItemColor(data);
         data.status = this.statuses[data.status];
         this.$set(this.tasks, taskIndex, data);
       } catch (e) {
         console.warn(e);
       }
     },
-    inspectTask(item) {
-      // addTask()
-      console.log(item);
+    showInfoModal(item, index, button) {
+      this.infoModal.name = item.name;
+      this.infoModal.itemId = item.id;
+      this.infoModal.description = item.description;
+
+      this.$root.$emit('bv::show::modal', this.infoModal.id, button);
     },
+
+
     showDeleteModal(item, index, button) {
       this.deleteModal.name = item.name;
       this.deleteModal.itemId = item.id;
       this.deleteModal.index = index;
-      console.log(this.deleteModal)
 
       this.$root.$emit('bv::show::modal', this.deleteModal.id, button);
     },
@@ -150,6 +182,11 @@ export default {
       this.deleteModal.name = '';
       this.deleteModal.itemId = '';
       this.deleteModal.index = -1;
+    },
+    resetInfoModal() {
+      this.infoModal.name = '';
+      this.infoModal.itemId = '';
+      this.infoModal.description = '';
     },
     async handleDelete(itemId, taskIndex) {
       try {
