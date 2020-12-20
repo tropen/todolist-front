@@ -1,5 +1,7 @@
 # todolist-front
 
+Description is on [todolist-back](https://github.com/tropen/todolist-back)
+
 ## Project setup
 ```
 npm install
