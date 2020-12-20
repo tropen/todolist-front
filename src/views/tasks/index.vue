@@ -1,78 +1,79 @@
 <template>
   <div>
     <b-card class="mt-3">
-    <div class="add-btn">
-      <b-button size="md"
-                @click="addTask()"
-                class="mr-1"
-                variant="warning"
-                v-b-tooltip.hover title="Add"
-      >
-        <b-icon class="add-btn-lbl" icon="plus-circle-fill" aria-hidden="true"></b-icon>
-      </b-button>
-    </div>
-    <b-table striped hover :busy="loading" :items="tasks" :fields="fields">
-      <template #table-busy>
-        <div class="text-center text-danger my-2">
-          <b-spinner class="align-middle"></b-spinner>
-          <strong>Loading...</strong>
-        </div>
-      </template>
-      <template #cell(actions)="row">
+      <div class="add-btn">
         <b-button size="md"
-                  v-if="row.item.status === statuses[planned]"
-                  @click="markCompleted(row)"
+                  @click="addTask()"
                   class="mr-1"
-                  variant="success"
-                  v-b-tooltip.hover title="Set completed"
+                  variant="warning"
+                  v-b-tooltip.hover title="Add"
         >
-          <b-icon icon="check-circle" aria-hidden="true"></b-icon>
+          <b-icon class="add-btn-lbl" icon="plus-circle-fill" aria-hidden="true"></b-icon>
         </b-button>
-        <b-button size="md" v-if="row.item.status === statuses[completed]"
-                  @click="markPlanned(row)"
-                  class="mr-1"
-                  variant="info"
-                  v-b-tooltip.hover title="Set planned">
-          <b-icon icon="circle" aria-hidden="true"></b-icon>
-        </b-button>
-        <b-button size="md"
-                  class="mr-1"
-                  @click="showInfoModal(row.item, row.index, $event.target)"
-                  variant="outline-primary"
-                  v-b-tooltip.hover title="Inspect">
-          <b-icon icon="search" aria-hidden="true"></b-icon>
-        </b-button>
-        <b-button size="md"
-                  @click="showDeleteModal(row.item, row.index, $event.target)"
-                  variant="danger"
-                  v-b-tooltip.hover title="Delete">
-          <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
-        </b-button>
+      </div>
+      <b-table striped hover :busy="loading" :items="tasks" :fields="fields">
+        <template #table-busy>
+          <div class="text-center text-danger my-2">
+            <b-spinner class="align-middle"></b-spinner>
+            <strong>Loading...</strong>
+          </div>
+        </template>
+        <template #cell(actions)="row">
+          <b-button size="md"
+                    v-if="row.item.status === statuses[planned]"
+                    @click="markCompleted(row)"
+                    class="mr-1"
+                    variant="success"
+                    v-b-tooltip.hover title="Set completed"
+          >
+            <b-icon icon="check-circle" aria-hidden="true"></b-icon>
+          </b-button>
+          <b-button size="md" v-if="row.item.status === statuses[completed]"
+                    @click="markPlanned(row)"
+                    class="mr-1"
+                    variant="info"
+                    v-b-tooltip.hover title="Set planned">
+            <b-icon icon="circle" aria-hidden="true"></b-icon>
+          </b-button>
+          <b-button size="md"
+                    class="mr-1"
+                    @click="showInfoModal(row.item, $event.target)"
+                    variant="outline-primary"
+                    v-b-tooltip.hover title="Inspect">
+            <b-icon icon="search" aria-hidden="true"></b-icon>
+          </b-button>
+          <b-button size="md"
+                    @click="showDeleteModal(row.item, row.index, $event.target)"
+                    variant="danger"
+                    v-b-tooltip.hover title="Delete">
+            <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
+          </b-button>
+        </template>
+      </b-table>
+
+      <task-modal
+      :id="'delete-modal'"
+      :task="model.item"
+      :index="model.index"
+      :actionType="'delete'"
+
+      @close-modal="resetModel"
+      @confirm-modal="handleDelete"
+      >
+      </task-modal>
+
+      <task-modal
+          :id="'info-modal'"
+          :task="model.item"
+          :index="-1"
+          :actionType="'info'"
+
+          @confirm-modal="resetModel"
+      >
+      </task-modal>
+      <template #header>
+        <h1>Task list</h1>
       </template>
-    </b-table>
-
-    <b-modal :id="deleteModal.id"
-             title="Delete confirmation"
-             @ok="handleDelete(deleteModal.itemId, deleteModal.index)"
-             @hide="resetDeleteModal">
-      <div class="text-center">
-        <strong>{{ deleteModal.itemId }}. {{ deleteModal.name }}</strong>
-        <div>Delete this task?</div>
-      </div>
-    </b-modal>
-
-    <b-modal :id="infoModal.id"
-             title="Task information"
-             ok-only
-             @hide="resetInfoModal">
-      <div class="text-center">
-        <strong>{{ infoModal.itemId }}. {{ infoModal.name }}</strong>
-        <div>{{ infoModal.description }}</div>
-      </div>
-    </b-modal>
-    <template #header>
-      <h1>Task list</h1>
-    </template>
     </b-card>
   </div>
 </template>
@@ -84,11 +85,14 @@ import {
   getTaskStatuses,
   updateTask
 } from '@/services/taskService';
+import TaskModal from "@/views/tasks/TaskModal";
 
 
 export default {
   name: "index",
-  components: {},
+  components: {
+    TaskModal,
+  },
   data() {
     return {
       loading: false,
@@ -97,18 +101,10 @@ export default {
       tasks: [],
       fields: [],
       statuses: [],
-      deleteModal: {
-        id: 'delete-modal',
-        name: '',
-        itemId: '',
+      model: {
+        modalId: 'delete-modal',
+        item: {},
         index: -1,
-      },
-      infoModal: {
-        id: 'info-modal',
-        name: '',
-        status: '',
-        itemId: '',
-        description: '',
       },
     }
   },
@@ -129,7 +125,11 @@ export default {
 
         });
         this.tasks = data;
-        this.fields = ['id', 'name', 'status', {key: 'actions', label: 'Actions'}]
+        this.fields = [
+          {key: 'id', sortable: true},
+          {key: 'name', sortable: true},
+          {key: 'status', sortable: true},
+          {key: 'actions', label: 'Actions'}];
         this.loading = false;
       } catch (e) {
         console.warn(e);
@@ -167,36 +167,30 @@ export default {
         console.warn(e);
       }
     },
-    showInfoModal(item, index, button) {
-      this.infoModal.name = item.name;
-      this.infoModal.itemId = item.id;
-      this.infoModal.description = item.description;
-      this.infoModal.status = item.status;
 
-      this.$root.$emit('bv::show::modal', this.infoModal.id, button);
+    showInfoModal(item, button) {
+      this.model.item = item;
+      this.model.modalId = 'info-modal';
+
+      this.$root.$emit('bv::show::modal', this.model.modalId, button);
+      console.log(this.model)
     },
-
-
     showDeleteModal(item, index, button) {
-      this.deleteModal.name = item.name;
-      this.deleteModal.itemId = item.id;
-      this.deleteModal.index = index;
+      this.model.item = item;
+      this.model.index = index;
+      this.model.modalId = 'delete-modal';
 
-      this.$root.$emit('bv::show::modal', this.deleteModal.id, button);
+      this.$root.$emit('bv::show::modal', this.model.modalId, button);
     },
-    resetDeleteModal() {
-      this.deleteModal.name = '';
-      this.deleteModal.itemId = '';
-      this.deleteModal.index = -1;
+    resetModel() {
+      this.model.modalId = '';
+      this.model.item = {};
+      this.model.index = -1;
     },
-    resetInfoModal() {
-      this.infoModal.name = '';
-      this.infoModal.itemId = '';
-      this.infoModal.description = '';
-    },
-    async handleDelete(itemId, taskIndex) {
+
+    async handleDelete(item, taskIndex) {
       try {
-        let {status} = await deleteTask(itemId);
+        let {status} = await deleteTask(item.id);
         if (status === 204) {
           this.tasks.splice(taskIndex, 1);
         }
@@ -219,7 +213,8 @@ export default {
   height: 1.3em;
   width: 1.3em;
 }
-.card-body{
+
+.card-body {
   padding: 0;
 }
 </style>

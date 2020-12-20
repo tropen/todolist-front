@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-card class="mt-3">
-    <b-form @submit="onSubmit" @reset="onCancel" class="form-align-left" :state="nameState && descriptionState">
+    <b-form @submit="onSubmit" @reset="onCancel" class="form-align-left">
       <b-form-group
           label="Task name:"
           label-for="name"
@@ -40,14 +40,6 @@ export default {
         description: '',
       },
       planned: 1,
-    }
-  },
-  computed: {
-    nameState() {
-      return (this.form.name.length > 3)
-    },
-    descriptionState() {
-      return (this.form.description.length > 10)
     }
   },
   methods: {
